@@ -901,9 +901,9 @@ body {
   }
 }
 @media screen and (max-width: 760px) {
-  .detail-page .job-overview-cards {
+  /* .detail-page .job-overview-cards {
     display: none;
-  }
+  } */
 
   .user-name {
     display: none;
@@ -1014,4 +1014,28 @@ body {
   border: 3px solid var(--border-color);
   border-top-color: var(--primary-color);
   animation: spin 1s infinite linear;
+}
+
+@media screen and (max-width: 760px) {
+  /* .job-overview-cards {
+    display: none;
+  } */
+  .job-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .job-explain{
+    display: none;
+  }
+ 
+  .search-menu  {
+    border: 0;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+    
+  }
+  
+
+
 }
