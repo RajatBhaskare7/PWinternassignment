@@ -15,6 +15,9 @@ function App() {
   const [range, setRange] = useState([0, 100000]);
   const [filteredDataSalary, setFilteredDataSalary] = useState([]);
   const [searchQuerySalary, setSearchQuerySalary] = useState('');
+  const [searchQueryindustry, setSearchQueryindustry] = useState('Software');
+  const [filteredDataindustry, setFilteredDataindustry] = useState([]);
+
 
   
   useEffect(()=>{
@@ -30,7 +33,7 @@ function App() {
       setFilteredData(res.data);
       setDetails(res.data[0]);
       setLoading(false);
-      console.log(data.stipend);
+      
       
 
       
@@ -59,6 +62,17 @@ function App() {
     );
     console.log(filteredResults);
     setFilteredData(filteredResults);
+  }
+  function handleSearchChangeindustry(event) {
+    const query = event.target.value;
+    setSearchQueryindustry(query);
+    console.log(query);
+    const filteredResults = data.filter(item =>
+      item.industry.toLowerCase().includes(query.toLowerCase())
+    );
+    console.log(filteredResults);
+    setFilteredData(filteredResults);
+
   }
 
 
@@ -149,9 +163,15 @@ function App() {
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase">
             <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
             <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" /></svg>
-            <p>Min Salary: ${range[0]}</p><br/>
-            --
-    <p>Max Salary: ${range[1]}</p>
+            <select class="search-button" name="cars" id="cars"
+            value={searchQueryindustry}
+            onChange={handleSearchChangeindustry}
+            >
+              <option value="Software">Software</option>
+              <option value="Agriculture">Agriculture</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Civil">Civil</option>
+            </select>
           </div>
           <div class="search-salary">
            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" fill="currentColor" stroke-width=".4">
@@ -165,8 +185,12 @@ function App() {
         value={range}
         onChange={handleRangeChange}
         range
-      />
+      /><br/>
+       
           </div>
+          <p>Min Salary: ${range[0]}</p><br/>
+            --
+    <p>Max Salary: ${range[1]}</p>
           <button class="search-button">Find Job</button>
          </div>
         { loading ? <div class="loader">
@@ -192,7 +216,7 @@ function App() {
                 <div class="overview-detail">
                  <div class="job-card-title">{item.jobTitle}</div>
                  <div class="job-card-subtitle">
-                 {item.location}
+                 {item.name},{item.location}
                  </div>
                 </div>
                 <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=" heart feather feather-heart">
