@@ -1,40 +1,79 @@
 import logo from './logo.svg';
 import './App.css';
-import Data from './dummyydata.js';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+
 function App() {
+  const [data,setData]= useState({});
   const [details, setDetails] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchQuerylocation, setSearchQuerylocation] = useState('');
+  const [loading , setLoading] = useState(true);
+  const [range, setRange] = useState([0, 100000]);
+  const [filteredDataSalary, setFilteredDataSalary] = useState([]);
+  const [searchQuerySalary, setSearchQuerySalary] = useState('');
+
+  
   useEffect(()=>{
-    setDetails(Data[0]);
-    //fetchdata from api and console it write here and also wrtite code for cors error
-    axios.get('https://internportal.rajatbhaskare7.repl.co/getall')
-    .then((response)=>{
-      console.log(response.data);
-    }
-    )
-    .catch((error)=>{
-      console.log(error);
-    }
-    )
     
+   fetchfun();
 
   },[]);
+  function fetchfun(){
+    axios.get('https://internportal.rajatbhaskare7.repl.co/getall')
+    .then((res)=>{
+      console.log(res.data);
+      setData(res.data);
+      setFilteredData(res.data);
+      setDetails(res.data[0]);
+      setLoading(false);
+      console.log(data.stipend);
+      
+
+      
+    }
+    )
+    .catch((err)=>{
+      console.log(err);
+    }
+    )
+    console.log(details);
+  }
+  const handleRangeChange = (newRange) => {
+    setRange(newRange);
+    const filteredResults = data.filter(item =>
+      item.stipend >= newRange[0] && item.stipend <= newRange[1]
+    );
+    
+    setFilteredData(filteredResults);
+  };
+  function handleSearchChangelocation(event) {
+    const query = event.target.value;
+    setSearchQuerylocation(query);
+
+    const filteredResults = data.filter(item =>
+      item.location.toLowerCase().includes(query.toLowerCase())
+    );
+    console.log(filteredResults);
+    setFilteredData(filteredResults);
+  }
+
 
   function hello(key){
-    console.log(key);
-    const newDetails = Data.find((item)=>item.id===key);
+    // console.log(key);
+    const newDetails = data.find((item)=>item.id===key);
     setDetails(newDetails);
     console.log(newDetails);
   }
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredData, setFilteredData] = useState(Data);
-
+  
   const handleSearchChange = (event) => {
     const query = event.target.value;
     setSearchQuery(query);
 
-    const filteredResults = Data.filter(item =>
+    const filteredResults = data.filter(item =>
       item.name.toLowerCase().includes(query.toLowerCase()) ||
       item.jobTitle.toLowerCase().includes(query.toLowerCase()) 
     );
@@ -101,16 +140,18 @@ function App() {
             <circle cx="12" cy="10" r="3" />
            </svg>
            <input type="text" class="search-box" autoFocus
-             value={searchQuery}
-             onChange={handleSearchChange}
+             value={searchQuerylocation}
+             onChange={handleSearchChangelocation}
              placeholder='Search by location'
            />
           </div>
           <div class="search-job">
-           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase">
             <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
             <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" /></svg>
-           <input type="text" placeholder="Job Type"/>
+            <p>Min Salary: ${range[0]}</p><br/>
+            --
+    <p>Max Salary: ${range[1]}</p>
           </div>
           <div class="search-salary">
            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" fill="currentColor" stroke-width=".4">
@@ -118,11 +159,20 @@ function App() {
             <path d="M12 20a.8.8 0 01-.8-.8v-2a.8.8 0 011.6 0v2c0 .5-.4.8-.8.8zM12 11.5a.8.8 0 01-.8-.8v-2a.8.8 0 011.6 0v2c0 .5-.4.8-.8.8z" stroke="currentColor" />
             <path d="M21.3 23H2.6A2.8 2.8 0 010 20.2V3.9C0 2.1 1.2 1 2.8 1h18.4C22.9 1 24 2.2 24 3.8v16.4c0 1.6-1.2 2.8-2.8 2.8zM2.6 2.5c-.6 0-1.2.6-1.2 1.3v16.4c0 .7.6 1.3 1.3 1.3h18.4c.7 0 1.3-.6 1.3-1.3V3.9c0-.7-.6-1.3-1.3-1.3z" stroke="currentColor" />
             <path d="M23.3 6H.6a.8.8 0 010-1.5h22.6a.8.8 0 010 1.5z" stroke="currentColor" /></svg>
-           <input type="text" placeholder="Salary Range"/>
+            <Slider
+        min={0}
+        max={100000}
+        value={range}
+        onChange={handleRangeChange}
+        range
+      />
           </div>
           <button class="search-button">Find Job</button>
          </div>
-         <div class="main-container">
+        { loading ? <div class="loader">
+                <div class="loader-inner"></div>
+                </div> :
+                  <div class="main-container">
          
           <div class="searched-jobs">
            
@@ -131,9 +181,9 @@ function App() {
             <div class="job-overview-cards"
             
             >
-        
-           
-             {
+              {
+                
+         
                 filteredData.map((item)=>{
                   return(
                     <div class="job-overview-card"  key={item.id} onClick={()=>hello(item.id)}>
@@ -163,7 +213,10 @@ function App() {
                   )
                 }
                 )
-             }
+             
+              }
+           
+             
             
             </div>
             <div class="job-explain">
@@ -252,6 +305,7 @@ function App() {
            </div>
           </div>
          </div>
+}
         </div>
        </div>
      
